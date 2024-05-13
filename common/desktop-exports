@@ -481,8 +481,10 @@ done
 # (see comments #3 and #6 on https://launchpad.net/bugs/1580463)
 IBUS_CONFIG_PATH="$XDG_CONFIG_HOME/ibus"
 ensure_dir_exists "$IBUS_CONFIG_PATH"
-[ -d "$IBUS_CONFIG_PATH/bus" ] && rm -rf "$IBUS_CONFIG_PATH/bus"
-ln -sfn "$SNAP_REAL_HOME/.config/ibus/bus" "$IBUS_CONFIG_PATH"
+if [ "$(realpath "$IBUS_CONFIG_PATH/bus" --relative-to="$SNAP_REAL_HOME/.config/ibus/bus" 2>/dev/null)" != "." ]; then
+  [ -d "$IBUS_CONFIG_PATH/bus" ] && rm -rf "$IBUS_CONFIG_PATH/bus"
+  ln -sfn "$SNAP_REAL_HOME/.config/ibus/bus" "$IBUS_CONFIG_PATH"
+fi
 
 # Set libgweather path
 export LIBGWEATHER_LOCATIONS_PATH="$SNAP_DESKTOP_RUNTIME/usr/lib/$ARCH/libgweather-4/Locations.bin"

@@ -7,6 +7,10 @@ if [ -n "$SNAP_DESKTOP_DEBUG" ]; then
   START=$(date +%s.%N)
 fi
 
+if [ -n "$SNAP_DESKTOP_VERBOSE" ]; then
+  set -x
+fi
+
 # ensure_dir_exists calls `mkdir -p` if the given path is not a directory.
 # This speeds up execution time by avoiding unnecessary calls to mkdir.
 #

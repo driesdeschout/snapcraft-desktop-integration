@@ -1,8 +1,5 @@
 #!/bin/bash
 
-if [ -n "$SNAP_DESKTOP_VERBOSE" ]; then
-  set -x
-fi
 ###############################################
 # Launcher common exports for any desktop app #
 ###############################################

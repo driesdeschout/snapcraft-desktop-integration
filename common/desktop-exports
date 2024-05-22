@@ -61,6 +61,10 @@ function is_subpath() {
   [ "${dir##"${parent}"/}" != "${dir}" ] && return 0 || return 1
 }
 
+function is_samepath() {
+  [ "$(realpath "$1" --relative-to="$2" 2>/dev/null)" == "." ] && return 0 || return 1
+}
+
 if ! snapctl is-connected "%PLATFORM_PLUG%"; then
   echo "ERROR: not connected to the %PLATFORM_PLUG% content interface."
   exit 1
@@ -419,7 +423,7 @@ if [ ! -f "$DCONF_DEST_USER_DIR/user" ]; then
   fi
 fi
 # symlink the runtime dconf file as well
-if [ -r "$XDG_RUNTIME_DIR/../dconf/user" ]; then
+if [ -r "$XDG_RUNTIME_DIR/../dconf/user" ] && ! is_samepath "$XDG_RUNTIME_DIR/dconf/user" "$XDG_RUNTIME_DIR/../dconf/user"; then
   ensure_dir_exists "$XDG_RUNTIME_DIR/dconf"
   ln -sf "../../dconf/user" "$XDG_RUNTIME_DIR/dconf/user"
 fi
@@ -480,8 +484,8 @@ done
 # create symbolic link to ibus socket path for ibus to look up its socket files
 # (see comments #3 and #6 on https://launchpad.net/bugs/1580463)
 IBUS_CONFIG_PATH="$XDG_CONFIG_HOME/ibus"
-ensure_dir_exists "$IBUS_CONFIG_PATH"
-if [ "$(realpath "$IBUS_CONFIG_PATH/bus" --relative-to="$SNAP_REAL_HOME/.config/ibus/bus" 2>/dev/null)" != "." ]; then
+if ! is_samepath "$IBUS_CONFIG_PATH/bus" "$SNAP_REAL_HOME/.config/ibus/bus"; then
+  ensure_dir_exists "$IBUS_CONFIG_PATH"
   [ -d "$IBUS_CONFIG_PATH/bus" ] && rm -rf "$IBUS_CONFIG_PATH/bus"
   ln -sfn "$SNAP_REAL_HOME/.config/ibus/bus" "$IBUS_CONFIG_PATH"
 fi
